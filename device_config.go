@@ -55,13 +55,13 @@ func DefaultDeviceConfig(deviceType DeviceType) DeviceConfig {
 	deviceConfig.Resampling.Algorithm = ResampleAlgorithm(config.resampling.algorithm)
 	deviceConfig.Resampling.Linear.LpfOrder = uint32(config.resampling.linear.lpfOrder)
 
-	deviceConfig.Playback.DeviceID = unsafe.Pointer(config.playback.pDeviceID)
+	deviceConfig.Playback.DeviceID = NewDeviceIDFromPointer(unsafe.Pointer(config.playback.pDeviceID))
 	deviceConfig.Playback.Format = FormatType(config.playback.format)
 	deviceConfig.Playback.Channels = uint32(config.playback.channels)
 	deviceConfig.Playback.ChannelMap = unsafe.Pointer(config.playback.pChannelMap)
 	deviceConfig.Playback.ShareMode = ShareMode(config.playback.shareMode)
 
-	deviceConfig.Capture.DeviceID = unsafe.Pointer(config.capture.pDeviceID)
+	deviceConfig.Capture.DeviceID = NewDeviceIDFromPointer(unsafe.Pointer(config.capture.pDeviceID))
 	deviceConfig.Capture.Format = FormatType(config.capture.format)
 	deviceConfig.Capture.Channels = uint32(config.capture.channels)
 	deviceConfig.Capture.ChannelMap = unsafe.Pointer(config.capture.pChannelMap)
@@ -108,13 +108,13 @@ func (d *DeviceConfig) toC() (C.ma_device_config, func()) {
 	deviceConfig.resampling.algorithm = C.ma_resample_algorithm(d.Resampling.Algorithm)
 	deviceConfig.resampling.linear.lpfOrder = C.uint(d.Resampling.Linear.LpfOrder)
 
-	deviceConfig.playback.pDeviceID = (*C.ma_device_id)(d.Playback.DeviceID)
+	deviceConfig.playback.pDeviceID = (*C.ma_device_id)(d.Playback.DeviceID.Pointer())
 	deviceConfig.playback.format = C.ma_format(d.Playback.Format)
 	deviceConfig.playback.channels = C.uint(d.Playback.Channels)
 	deviceConfig.playback.pChannelMap = (*C.ma_channel)(d.Playback.ChannelMap)
 	deviceConfig.playback.shareMode = C.ma_share_mode(d.Playback.ShareMode)
 
-	deviceConfig.capture.pDeviceID = (*C.ma_device_id)(d.Capture.DeviceID)
+	deviceConfig.capture.pDeviceID = (*C.ma_device_id)(d.Capture.DeviceID.Pointer())
 	deviceConfig.capture.format = C.ma_format(d.Capture.Format)
 	deviceConfig.capture.channels = C.uint(d.Capture.Channels)
 	deviceConfig.capture.pChannelMap = (*C.ma_channel)(d.Capture.ChannelMap)
@@ -155,7 +155,7 @@ func (d *DeviceConfig) toC() (C.ma_device_config, func()) {
 
 // SubConfig type.
 type SubConfig struct {
-	DeviceID   unsafe.Pointer
+	DeviceID   *DeviceID
 	Format     FormatType
 	Channels   uint32
 	ChannelMap unsafe.Pointer

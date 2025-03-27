@@ -21,6 +21,14 @@ func NewDeviceIDFromString(id string) (DeviceID, error) {
 	return deviceID, nil
 }
 
+func NewDeviceIDFromPointer(ptr unsafe.Pointer) *DeviceID {
+	if ptr == nil {
+		return nil
+	} else {
+		return (*DeviceID)(ptr)
+	}
+}
+
 // String returns the string representation of the identifier.
 // It is the hexadecimal form of the underlying bytes of a minimum length of 2 digits, with trailing zeroes removed.
 func (d *DeviceID) String() string {
@@ -32,7 +40,11 @@ func (d *DeviceID) String() string {
 }
 
 func (d *DeviceID) Pointer() unsafe.Pointer {
-	return C.CBytes(d[:])
+	if d == nil {
+		return nil
+	} else {
+		return C.CBytes(d[:])
+	}
 }
 
 func (d *DeviceID) cptr() *C.ma_device_id {
